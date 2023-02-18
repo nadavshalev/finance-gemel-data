@@ -8,22 +8,24 @@ import os
 
 :return: 
 '''
-def load_all_data():
+def load_all_data(classification):
     """ load all data from 'csv' folder
+    :param classification: the classification of the fund
     :return: dataframe with all the data
     """
 
     csv_files = glob.glob(os.path.join(os.path.join(os.getcwd(), "csv"), "*.csv"))
     fund_arr = []
     for fnd in csv_files:
-        tmp_fund = load_single_data(fnd)
+        tmp_fund = load_single_data(fnd, classification)
         fund_arr.append(tmp_fund)
     return pd.concat(fund_arr)
 
 
-def load_single_data(file_path):
+def load_single_data(file_path, classification):
     """ load each file
     :param file_path: path to the desired file
+    :param classification: the classification of the fund
     :return: dataframe
     """
 
@@ -32,12 +34,12 @@ def load_single_data(file_path):
     except:
         df = pd.read_csv(file_path)
 
-    df2 = preprocess_data(df)
+    df2 = preprocess_data(df, classification)
 
     print("loaded: " + file_path)
     return df2
 
-def preprocess_data(df, classification="קופת גמל להשקעה"):
+def preprocess_data(df, classification):
     """ pre-process the dataframe
     :param df: dataframe to process
     :param classification: the classification of the fund
@@ -71,3 +73,11 @@ def preprocess_data(df, classification="קופת גמל להשקעה"):
     df2['in_out_ratio'] = [10 * math.log10(deposits[i] / withdrawls[i]) for i in range(len(deposits))]
 
     return df2
+
+def get_all_types(file_path):
+    try:
+        df = pd.read_csv(file_path, encoding="ISO-8859-8")
+    except:
+        df = pd.read_csv(file_path)
+
+    return df["FUND_CLASSIFICATION"].unique().tolist()
